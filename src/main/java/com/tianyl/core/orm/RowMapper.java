@@ -1,4 +1,4 @@
-package com.tianyl.core.util.sql;
+package com.tianyl.core.orm;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
