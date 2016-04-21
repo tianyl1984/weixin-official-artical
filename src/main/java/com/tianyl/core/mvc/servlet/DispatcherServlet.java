@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONObject;
+import com.tianyl.core.ioc.ApplicationContext;
 import com.tianyl.core.mvc.annotation.Controller;
 import com.tianyl.core.util.clazz.ClassUtil;
 import com.tianyl.core.util.clazz.MethodParamNamesScaner;
@@ -32,7 +33,7 @@ public class DispatcherServlet extends HttpServlet {
 		List<Class<?>> controllerClazz = ClassUtil.getClassList(basePackage, true, Controller.class);
 		for (Class<?> clazz : controllerClazz) {
 			try {
-				Object controller = clazz.newInstance();
+				Object controller = ApplicationContext.getBean(clazz);
 				String path = clazz.getAnnotation(Controller.class).value();
 				controllerMap.put(path, controller);
 			} catch (Exception e) {
