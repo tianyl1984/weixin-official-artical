@@ -142,8 +142,16 @@ public class JdbcUtil {
 
 	private static Connection getConnection() throws SQLException {
 		String url = "jdbc:mysql://127.0.0.1:3306/weixin?useUnicode=true&characterEncoding=utf-8";
-		Connection conn = DriverManager.getConnection(url, "root", "hzth-801");
+		Connection conn = DriverManager.getConnection(url, "root", "tyl123");
 		return conn;
+	}
+
+	public static List<Integer> saveList(List<?> models) {
+		List<Integer> result = new ArrayList<>();
+		for (Object obj : models) {
+			result.add(save(obj));
+		}
+		return result;
 	}
 
 	public static Integer save(Object model) {

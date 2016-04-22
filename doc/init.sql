@@ -15,6 +15,7 @@ CREATE TABLE `wx_artical` (
 	`title` VARCHAR(200) NOT NULL,
 	`url` VARCHAR(1000) NOT NULL,
 	`publishDate` DATE NULL DEFAULT NULL,
+	`uuid` VARCHAR(100) DEFAULT NULL,
 	PRIMARY KEY (`id`)
 )
 COLLATE='utf8_general_ci'

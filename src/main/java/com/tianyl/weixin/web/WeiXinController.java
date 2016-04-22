@@ -10,8 +10,4 @@ public class WeiXinController {
 	@Autowired
 	private ArticalService articalService;
 
-	public Object m1(String name) {
-		articalService.m1();
-		return "ok";
-	}
 }

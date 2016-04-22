@@ -19,6 +19,8 @@ public class Artical {
 
 	private Date publishDate;
 
+	private String uuid;
+
 	public Integer getId() {
 		return id;
 	}
@@ -57,6 +59,14 @@ public class Artical {
 
 	public void setPublishDate(Date publishDate) {
 		this.publishDate = publishDate;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 }
