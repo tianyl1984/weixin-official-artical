@@ -147,4 +147,18 @@ public class ArticalService {
 		// e.printStackTrace();
 		// }
 	}
+
+	public JSONArray find(Integer officialAccountId) {
+		List<Artical> articals = articalDAO.find(officialAccountId);
+		JSONArray result = new JSONArray();
+		for (Artical artical : articals) {
+			JSONObject obj = new JSONObject();
+			obj.put("id", artical.getId());
+			obj.put("publishDate", artical.getPublishDate());
+			obj.put("title", artical.getTitle());
+			obj.put("url", artical.getUrl());
+			result.add(obj);
+		}
+		return result;
+	}
 }

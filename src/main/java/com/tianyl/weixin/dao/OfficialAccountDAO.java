@@ -9,7 +9,7 @@ import com.tianyl.weixin.model.OfficialAccount;
 @Component
 public class OfficialAccountDAO {
 
-	public static Integer save(OfficialAccount oa) {
+	public Integer save(OfficialAccount oa) {
 		return JdbcUtil.save(oa);
 	}
 
