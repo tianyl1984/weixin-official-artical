@@ -2,8 +2,11 @@ package com.tianyl.weixin.service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,6 +23,7 @@ import com.tianyl.weixin.dao.ArticalDAO;
 import com.tianyl.weixin.dao.OfficialAccountDAO;
 import com.tianyl.weixin.model.OfficialAccount;
 import com.tianyl.weixin.util.WeiXinUtil;
+import com.tianyl.weixin.vo.AccountInfoVO;
 
 @Service
 public class OfficialAccountService {
@@ -56,25 +60,40 @@ public class OfficialAccountService {
 		if (!request.isOk()) {
 			return null;
 		}
-		JSONArray result = parseAccount(request.getResultStr());
+		Set<String> savedWxIds = officialAccountDAO.findExistWxIds();
+		List<AccountInfoVO> vos = parseAccount(request.getResultStr());
+		JSONArray result = new JSONArray();
+		Set<String> wxIds = new HashSet<String>();
+		for (AccountInfoVO vo : vos) {
+			if (wxIds.contains(vo.getWxId())) {
+				continue;
+			}
+			JSONObject obj = new JSONObject();
+			obj.put("name", vo.getName());
+			obj.put("wxId", vo.getWxId());
+			obj.put("url", vo.getUrl());
+			obj.put("exist", savedWxIds.contains(vo.getWxId()));
+			result.add(obj);
+			wxIds.add(vo.getWxId());
+		}
 		return result;
 	}
 
-	private JSONArray parseAccount(String html) {
+	private List<AccountInfoVO> parseAccount(String html) {
+		List<AccountInfoVO> result = new ArrayList<AccountInfoVO>();
 		Document doc = Jsoup.parse(html);
 		Elements eles = doc.getElementsByClass("_item");
-		JSONArray result = new JSONArray();
 		if (eles != null) {
 			for (int index = 0; index < eles.size(); index++) {
 				Element ele = eles.get(index);
 				String name = WeiXinUtil.getValue(ele, ".txt-box h3");
 				String wxId = WeiXinUtil.getValue(ele, ".txt-box h4 label");
 				String url = ele.attr("href");
-				JSONObject obj = new JSONObject();
-				obj.put("name", name);
-				obj.put("wxId", wxId);
-				obj.put("url", url);
-				result.add(obj);
+				AccountInfoVO vo = new AccountInfoVO();
+				vo.setName(name);
+				vo.setWxId(wxId);
+				vo.setUrl(url);
+				result.add(vo);
 			}
 		}
 		return result;

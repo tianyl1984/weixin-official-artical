@@ -1,6 +1,8 @@
 package com.tianyl.weixin.dao;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.tianyl.core.ioc.annotation.Component;
 import com.tianyl.core.orm.JdbcUtil;
@@ -15,6 +17,13 @@ public class OfficialAccountDAO {
 
 	public List<OfficialAccount> findAll() {
 		return JdbcUtil.queryAll(OfficialAccount.class);
+	}
+
+	public Set<String> findExistWxIds() {
+		List<String> temp = JdbcUtil.queryStr("select wxId from wx_officialaccount");
+		Set<String> result = new HashSet<String>();
+		result.addAll(temp);
+		return result;
 	}
 
 }
