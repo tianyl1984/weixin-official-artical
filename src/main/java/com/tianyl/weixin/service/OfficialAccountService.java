@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.tianyl.core.ioc.annotation.Autowired;
 import com.tianyl.core.ioc.annotation.Service;
+import com.tianyl.core.util.CollectionUtil;
 import com.tianyl.core.util.webClient.RequestResult;
 import com.tianyl.core.util.webClient.WebUtil;
 import com.tianyl.weixin.dao.ArticalDAO;
@@ -104,5 +105,22 @@ public class OfficialAccountService {
 		oa.setName(name);
 		oa.setWxId(wxId);
 		officialAccountDAO.save(oa);
+	}
+
+	public JSONArray getUnreadAccount() {
+		List<OfficialAccount> accounts = officialAccountDAO.findUnread();
+		if (CollectionUtil.isEmpty(accounts)) {
+			return null;
+		}
+		Map<Integer, Integer> articalCountMap = articalDAO.findUnreadCountMap();
+		JSONArray result = new JSONArray();
+		for (OfficialAccount oa : accounts) {
+			JSONObject obj = new JSONObject();
+			obj.put("id", oa.getId());
+			obj.put("name", oa.getName());
+			obj.put("count", articalCountMap.get(oa.getId()));
+			result.add(obj);
+		}
+		return result;
 	}
 }

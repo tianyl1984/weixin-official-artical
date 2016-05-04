@@ -91,7 +91,7 @@ public class ArticalService {
 		LogManager.log("-------------------------");
 		LogManager.log("oaId:" + oaId);
 		LogManager.log("historyUrl:" + historyUrl);
-		LogManager.log("msgList:" + msgList);
+		// LogManager.log("msgList:" + msgList);
 		LogManager.log("-------------------------");
 		JSONObject msgObj = JSONObject.parseObject(msgList);
 		JSONArray msgArray = msgObj.getJSONArray("list");
@@ -161,4 +161,23 @@ public class ArticalService {
 		}
 		return result;
 	}
+
+	public void setHasRead(Integer articalId) {
+		articalDAO.updateToRead(articalId);
+	}
+
+	public JSONArray findUnreadArticals(Integer officialAccountId) {
+		List<Artical> articals = articalDAO.findUnreadArticals(officialAccountId);
+		JSONArray result = new JSONArray();
+		for (Artical artical : articals) {
+			JSONObject obj = new JSONObject();
+			obj.put("id", artical.getId());
+			obj.put("publishDate", artical.getPublishDate());
+			obj.put("title", artical.getTitle());
+			obj.put("url", artical.getUrl());
+			result.add(obj);
+		}
+		return result;
+	}
+
 }

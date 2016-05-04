@@ -21,6 +21,8 @@ public class Artical {
 
 	private String uuid;
 
+	private boolean hasRead;
+
 	public Integer getId() {
 		return id;
 	}
@@ -67,6 +69,14 @@ public class Artical {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public boolean isHasRead() {
+		return hasRead;
+	}
+
+	public void setHasRead(boolean hasRead) {
+		this.hasRead = hasRead;
 	}
 
 }

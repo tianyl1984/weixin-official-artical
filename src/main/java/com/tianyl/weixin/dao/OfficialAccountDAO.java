@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.tianyl.core.ioc.annotation.Component;
+import com.tianyl.core.orm.GenericRowMapper;
 import com.tianyl.core.orm.JdbcUtil;
 import com.tianyl.weixin.model.OfficialAccount;
 
@@ -24,6 +25,10 @@ public class OfficialAccountDAO {
 		Set<String> result = new HashSet<String>();
 		result.addAll(temp);
 		return result;
+	}
+
+	public List<OfficialAccount> findUnread() {
+		return JdbcUtil.query("select * from wx_officialaccount where id in (select id_officialaccount from wx_artical where hasRead = ? )", new GenericRowMapper<>(OfficialAccount.class), false);
 	}
 
 }

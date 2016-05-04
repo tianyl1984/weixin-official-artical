@@ -46,4 +46,27 @@ public class ArticalDAO {
 		return JdbcUtil.query(sql, new GenericRowMapper<>(Artical.class), officialAccountId);
 	}
 
+	public Map<Integer, Integer> findUnreadCountMap() {
+		String sql = "select count(1) cnt,id_officialaccount oaId from wx_artical where hasRead = ? group by id_officialaccount";
+		final Map<Integer, Integer> result = new HashMap<Integer, Integer>();
+		JdbcUtil.query(sql, new RowMapper<String>() {
+			@Override
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+				result.put(rs.getInt("oaId"), rs.getInt("cnt"));
+				return null;
+			}
+		}, false);
+		return result;
+	}
+
+	public void updateToRead(Integer articalId) {
+		String sql = "update wx_artical set hasRead = ? where id = ?";
+		JdbcUtil.update(sql, true, articalId);
+	}
+
+	public List<Artical> findUnreadArticals(Integer officialAccountId) {
+		String sql = "select * from wx_artical where id_officialaccount = ? and hasRead = ? order by publishDate desc";
+		return JdbcUtil.query(sql, new GenericRowMapper<>(Artical.class), officialAccountId, false);
+	}
+
 }

@@ -20,8 +20,18 @@ public class WeiXinController {
 		return result;
 	}
 
+	public Object getUnreadAccount() {
+		JSONArray result = officialAccountService.getUnreadAccount();
+		return result;
+	}
+
 	public Object getArticals(Integer officialAccountId) {
 		JSONArray result = articalService.find(officialAccountId);
+		return result;
+	}
+
+	public Object getUnreadArticals(Integer officialAccountId) {
+		JSONArray result = articalService.findUnreadArticals(officialAccountId);
 		return result;
 	}
 
@@ -31,5 +41,9 @@ public class WeiXinController {
 
 	public void save(String wxId, String name) {
 		officialAccountService.save(wxId, name);
+	}
+
+	public void setHasRead(Integer articalId) {
+		articalService.setHasRead(articalId);
 	}
 }

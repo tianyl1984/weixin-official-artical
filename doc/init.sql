@@ -21,3 +21,5 @@ CREATE TABLE `wx_artical` (
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
+
+ALTER TABLE `wx_artical` ADD COLUMN `hasRead` BOOLEAN DEFAULT 0;
