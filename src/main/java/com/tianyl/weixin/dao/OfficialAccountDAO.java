@@ -31,4 +31,12 @@ public class OfficialAccountDAO {
 		return JdbcUtil.query("select * from wx_officialaccount where id in (select id_officialaccount from wx_artical where hasRead = ? )", new GenericRowMapper<>(OfficialAccount.class), false);
 	}
 
+	public Integer findAllCount() {
+		return JdbcUtil.queryIntOne("select count(1) cnt from wx_officialaccount");
+	}
+
+	public Integer findUnreadCount() {
+		return JdbcUtil.queryIntOne("select count(distinct id_officialaccount) from wx_artical where hasRead = ?", false);
+	}
+
 }

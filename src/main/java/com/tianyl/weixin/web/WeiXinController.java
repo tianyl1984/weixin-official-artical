@@ -1,6 +1,7 @@
 package com.tianyl.weixin.web;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.tianyl.core.ioc.annotation.Autowired;
 import com.tianyl.core.mvc.annotation.Controller;
 import com.tianyl.weixin.service.ArticalService;
@@ -45,5 +46,10 @@ public class WeiXinController {
 
 	public void setHasRead(Integer articalId) {
 		articalService.setHasRead(articalId);
+	}
+
+	public Object getAccountCount() {
+		JSONObject obj = officialAccountService.getAccountCount();
+		return obj;
 	}
 }

@@ -118,6 +118,25 @@ public class JdbcUtil {
 		}, args);
 	}
 
+	public static String queryStrOne(String sql, Object... args) {
+		List<String> list = queryStr(sql, args);
+		return list.size() > 0 ? list.get(0) : null;
+	}
+
+	public static List<Integer> queryInt(String sql, Object... args) {
+		return query(sql, new RowMapper<Integer>() {
+			@Override
+			public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getInt(1);
+			}
+		}, args);
+	}
+
+	public static Integer queryIntOne(String sql, Object... args) {
+		List<Integer> list = queryInt(sql, args);
+		return list.size() > 0 ? list.get(0) : null;
+	}
+
 	private static void close(Connection conn) {
 		if (conn != null) {
 			try {
@@ -238,7 +257,7 @@ public class JdbcUtil {
 		return tableName;
 	}
 
-	public static Object getModelValue(Object model, String column) {
+	private static Object getModelValue(Object model, String column) {
 		Field[] fs = model.getClass().getDeclaredFields();
 		for (Field f : fs) {
 			String temp = f.getName();
@@ -264,7 +283,7 @@ public class JdbcUtil {
 		return null;
 	}
 
-	public static void setModelValue(Object model, String column, Object value) {
+	private static void setModelValue(Object model, String column, Object value) {
 		Field[] fs = model.getClass().getDeclaredFields();
 		for (Field f : fs) {
 			String temp = f.getName();

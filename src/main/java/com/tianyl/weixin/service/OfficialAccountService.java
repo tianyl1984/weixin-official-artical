@@ -123,4 +123,14 @@ public class OfficialAccountService {
 		}
 		return result;
 	}
+
+	public JSONObject getAccountCount() {
+		JSONObject result = new JSONObject();
+		Integer allCount = officialAccountDAO.findAllCount();
+		Integer unread = officialAccountDAO.findUnreadCount();
+		result.put("allCount", allCount);
+		result.put("unread", unread);
+		return result;
+	}
+
 }
