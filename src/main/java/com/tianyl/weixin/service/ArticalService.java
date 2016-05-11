@@ -106,7 +106,7 @@ public class ArticalService {
 			artical.setPublishDate(new Date(time * 1000));
 			artical.setTitle(title);
 			artical.setUrl(url);
-			artical.setUuid(uuid);
+			artical.setUuid(oaId + "_" + uuid + "_" + time);
 			result.add(artical);
 			JSONArray multiArr = obj.getJSONObject("app_msg_ext_info").getJSONArray("multi_app_msg_item_list");
 			if (multiArr != null) {
@@ -118,7 +118,7 @@ public class ArticalService {
 					childArtical.setTitle(childObj.getString("title"));
 					String childUrl = "http://mp.weixin.qq.com" + StringEscapeUtils.unescapeHtml(childObj.getString("content_url"));
 					childArtical.setUrl(childUrl);
-					childArtical.setUuid(childObj.getString("fileid"));
+					childArtical.setUuid(oaId + "_" + childObj.getString("fileid") + "_" + time);
 					result.add(childArtical);
 				}
 			}
