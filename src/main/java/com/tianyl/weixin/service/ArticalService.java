@@ -13,7 +13,6 @@ import org.jsoup.select.Elements;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.tianyl.core.ioc.ApplicationContext;
 import com.tianyl.core.ioc.annotation.Autowired;
 import com.tianyl.core.ioc.annotation.Service;
 import com.tianyl.core.util.StringUtil;
@@ -109,6 +108,20 @@ public class ArticalService {
 			artical.setUrl(url);
 			artical.setUuid(uuid);
 			result.add(artical);
+			JSONArray multiArr = obj.getJSONObject("app_msg_ext_info").getJSONArray("multi_app_msg_item_list");
+			if (multiArr != null) {
+				for (int chileIndex = 0; chileIndex < multiArr.size(); chileIndex++) {
+					JSONObject childObj = multiArr.getJSONObject(chileIndex);
+					Artical childArtical = new Artical();
+					childArtical.setOfficialAccountId(oaId);
+					childArtical.setPublishDate(new Date(time * 1000));
+					childArtical.setTitle(childObj.getString("title"));
+					String childUrl = "http://mp.weixin.qq.com" + StringEscapeUtils.unescapeHtml(childObj.getString("content_url"));
+					childArtical.setUrl(childUrl);
+					childArtical.setUuid(childObj.getString("fileid"));
+					result.add(childArtical);
+				}
+			}
 		}
 		return result;
 	}
@@ -138,7 +151,7 @@ public class ArticalService {
 	}
 
 	public static void main(String[] args) {
-		ApplicationContext.getBean(ArticalService.class).crawl();
+		// ApplicationContext.getBean(ArticalService.class).crawl();
 		// ScriptEngineManager mgr = new ScriptEngineManager();
 		// ScriptEngine engine = mgr.getEngineByExtension("js");
 		// try {
@@ -146,6 +159,13 @@ public class ArticalService {
 		// } catch (ScriptException e) {
 		// e.printStackTrace();
 		// }
+		ArticalService as = new ArticalService();
+		String historyUrl = "http://mp.weixin.qq.com/profile?src=3&timestamp=1462955032&ver=1&signature=6XnFE15hYT3PtRbwbPlJjzOBMetU1uI914M-q6uL*7TuhpEa2GlKCeDzJTBd86M67OXxYr*8w0fdBFKs7JZYFQ==";
+		// historyUrl = "http://mp.weixin.qq.com/profile?src=3&timestamp=1462956037&ver=1&signature=SrvuhkyQMfuG-9qM6S8D0aSvFiHuLuw2QN11IftWTOEw9v8HCamK3b3EkrtGncFIr95IqJMmZSB9wWE0YRVVLQ==";
+		List<Artical> articals = as.parseArtical(historyUrl, 12);
+		for (Artical a : articals) {
+			System.out.println(a.getUuid() + " : " + a.getTitle() + " : " + a.getUrl());
+		}
 	}
 
 	public JSONArray find(Integer officialAccountId) {
