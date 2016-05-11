@@ -116,7 +116,7 @@ public class ArticalService {
 					childArtical.setOfficialAccountId(oaId);
 					childArtical.setPublishDate(new Date(time * 1000));
 					childArtical.setTitle(childObj.getString("title"));
-					String childUrl = "http://mp.weixin.qq.com" + StringEscapeUtils.unescapeHtml(childObj.getString("content_url"));
+					String childUrl = "http://mp.weixin.qq.com" + StringEscapeUtils.unescapeHtml(childObj.getString("content_url")).substring(1);
 					childArtical.setUrl(childUrl);
 					childArtical.setUuid(oaId + "_" + childObj.getString("fileid") + "_" + time);
 					result.add(childArtical);
