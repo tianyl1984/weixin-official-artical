@@ -79,4 +79,9 @@ public class ArticalDAO {
 		JdbcUtil.update(sql, false, articalId);
 	}
 
+	public List<Artical> findNeedOfflineArtical() {
+		String sql = "select * from wx_artical where offlineUrl is null limit 1000";
+		return JdbcUtil.query(sql, new GenericRowMapper<>(Artical.class));
+	}
+
 }

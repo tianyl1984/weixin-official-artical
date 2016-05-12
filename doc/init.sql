@@ -23,3 +23,5 @@ ENGINE=InnoDB
 ;
 
 ALTER TABLE `wx_artical` ADD COLUMN `hasRead` BOOLEAN DEFAULT 0;
+
+alter table `wx_artical` add offlineUrl varchar(500) default null;

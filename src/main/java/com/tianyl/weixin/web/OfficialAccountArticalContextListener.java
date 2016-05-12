@@ -14,27 +14,42 @@ import com.tianyl.weixin.service.ArticalService;
 @WebListener
 public class OfficialAccountArticalContextListener implements ServletContextListener {
 
-	private Timer timer = new Timer();
+	private Timer crawlTimer = new Timer();
+
+	private Timer offlineTimer = new Timer();
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		timer.schedule(new TimerTask() {
+		crawlTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				LogManager.log("start job");
+				LogManager.log("start crawl job");
 				try {
 					ApplicationContext.getBean(ArticalService.class).crawl();
 				} catch (Exception e) {
 					LogManager.log(e);
 				}
-				LogManager.log("end job");
+				LogManager.log("end crawl job");
 			}
-		}, 10 * 1000, 1000 * 60 * 60 * 20);
+		}, 10 * 1000, 1000 * 60 * 60 * 20);// 20小时执行一次
+		offlineTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				LogManager.log("start offline job");
+				try {
+					ApplicationContext.getBean(ArticalService.class).offlineArtical();
+				} catch (Exception e) {
+					LogManager.log(e);
+				}
+				LogManager.log("end offline job");
+			}
+		}, 50 * 1000, 1000 * 60 * 60 * 10);// 10小时执行一次
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		timer.cancel();
+		crawlTimer.cancel();
+		offlineTimer.cancel();
 	}
 
 }

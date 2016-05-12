@@ -23,6 +23,8 @@ public class Artical {
 
 	private boolean hasRead;
 
+	private String offlineUrl;
+
 	public Integer getId() {
 		return id;
 	}
@@ -77,6 +79,14 @@ public class Artical {
 
 	public void setHasRead(boolean hasRead) {
 		this.hasRead = hasRead;
+	}
+
+	public String getOfflineUrl() {
+		return offlineUrl;
+	}
+
+	public void setOfflineUrl(String offlineUrl) {
+		this.offlineUrl = offlineUrl;
 	}
 
 }

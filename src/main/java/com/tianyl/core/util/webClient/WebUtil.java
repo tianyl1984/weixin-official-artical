@@ -1,8 +1,13 @@
 package com.tianyl.core.util.webClient;
 
+import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -37,10 +42,12 @@ public class WebUtil {
 		}
 		try {
 			HttpURLConnection conn = (HttpURLConnection) (new URL(checkUrl(url)).openConnection());
+			conn.setConnectTimeout(30 * 1000);
+			conn.setReadTimeout(30 * 1000);
 			if (!paramMap.isEmpty()) {
-				conn.setDoInput(true);
+				conn.setDoOutput(true);
 			}
-			conn.setDoOutput(true);
+			conn.setDoInput(true);
 			conn.setRequestMethod(isGet ? "GET" : "POST");
 			conn.setUseCaches(false);
 			// 仅对当前请求自动重定向
@@ -74,6 +81,33 @@ public class WebUtil {
 		return rr;
 	}
 
+	public static String getUrlResponse(String url) {
+		try {
+			HttpURLConnection conn = (HttpURLConnection) (new URL(checkUrl(url)).openConnection());
+			// 必须大写
+			conn.setRequestMethod("GET");
+			conn.setUseCaches(false);
+			// 请求头
+			// 仅对当前请求自动重定向
+			conn.setInstanceFollowRedirects(false);
+			// header 设置编码
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:42.0) Gecko/20100101 Firefox/42.0");
+			conn.setConnectTimeout(10000);
+			// 连接
+			conn.connect();
+			if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+				throw new IOException();
+			}
+			String result = new String(IOUtils.toByteArray(conn.getInputStream()));
+			conn.disconnect();
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private static String checkUrl(String url) {
 		String result = url;
 		if (url.startsWith("http://")) {
@@ -88,7 +122,7 @@ public class WebUtil {
 
 	private static void writeParameters(HttpURLConnection conn,
 			Map<String, String> map) throws IOException {
-		if (map == null) {
+		if (map == null || map.isEmpty()) {
 			return;
 		}
 		String content = "";
@@ -106,4 +140,52 @@ public class WebUtil {
 		out.close();
 	}
 
+	public static void downloadFileSimple(String url, File file) {
+		try {
+			HttpURLConnection con = (HttpURLConnection) new URL(checkUrl(url)).openConnection();
+			con.setUseCaches(false);
+			if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+				throw new RuntimeException("download error url : " + url);
+			}
+			InputStream is = con.getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			if (!file.getParentFile().exists()) {
+				file.getParentFile().mkdirs();
+			}
+			FileOutputStream fos = new FileOutputStream(file);
+			byte[] b = new byte[1024];
+			int length = 0;
+			while ((length = bis.read(b)) != -1) {
+				fos.write(b, 0, length);
+			}
+			fos.close();
+			bis.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String getRealURL(String docUrl, String url) {
+		if (url.startsWith("http://") || url.startsWith("https://")) {
+			return url;
+		}
+		String aa = "";
+		try {
+			URI uri = new URI(docUrl);
+			aa = uri.getScheme() + "://" + uri.getHost();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return aa + url;
+	}
+
+	public static void main(String[] args) {
+		// 文章页
+		String url = "http://mp.weixin.qq.com/s?timestamp=1462959204&src=3&ver=1&signature=W029zTYLzc2FkePsbEHcZmaE3iR3MjSyhRmH0ETUYtIxX4ZNDtosRgmf7vR-uhy3ENziuGHHlYcERSNGsbWBIbGkGnosGZx35O-zrHsT4a4m-fz9MLy-cYu4MuJlB3ifgxAgsPkYnnnFos5HIJWOZFHsJPoBDK9HKWX2aI8gINw=";
+		// 历史页
+		url = "http://mp.weixin.qq.com/profile?src=3&timestamp=1463031441&ver=1&signature=6XnFE15hYT3PtRbwbPlJjzOBMetU1uI914M-q6uL*7TuhpEa2GlKCeDzJTBd86M6nXxvwugInETSj43ckD57tw==";
+		// System.out.println(getUrlResponse(url));
+		System.out.println(getUrlResponse(url, null, null, true).getResultStr());
+	}
 }

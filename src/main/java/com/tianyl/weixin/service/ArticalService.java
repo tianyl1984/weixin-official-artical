@@ -1,9 +1,11 @@
 package com.tianyl.weixin.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
@@ -16,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.tianyl.core.ioc.annotation.Autowired;
 import com.tianyl.core.ioc.annotation.Service;
 import com.tianyl.core.util.StringUtil;
+import com.tianyl.core.util.io.IOUtils;
 import com.tianyl.core.util.log.LogManager;
 import com.tianyl.core.util.webClient.RequestResult;
 import com.tianyl.core.util.webClient.WebUtil;
@@ -150,24 +153,6 @@ public class ArticalService {
 		return url;
 	}
 
-	public static void main(String[] args) {
-		// ApplicationContext.getBean(ArticalService.class).crawl();
-		// ScriptEngineManager mgr = new ScriptEngineManager();
-		// ScriptEngine engine = mgr.getEngineByExtension("js");
-		// try {
-		// engine.eval("var aaa = 'bbb';var bbb = 'ccc'");
-		// } catch (ScriptException e) {
-		// e.printStackTrace();
-		// }
-		ArticalService as = new ArticalService();
-		String historyUrl = "http://mp.weixin.qq.com/profile?src=3&timestamp=1462955032&ver=1&signature=6XnFE15hYT3PtRbwbPlJjzOBMetU1uI914M-q6uL*7TuhpEa2GlKCeDzJTBd86M67OXxYr*8w0fdBFKs7JZYFQ==";
-		// historyUrl = "http://mp.weixin.qq.com/profile?src=3&timestamp=1462956037&ver=1&signature=SrvuhkyQMfuG-9qM6S8D0aSvFiHuLuw2QN11IftWTOEw9v8HCamK3b3EkrtGncFIr95IqJMmZSB9wWE0YRVVLQ==";
-		List<Artical> articals = as.parseArtical(historyUrl, 12);
-		for (Artical a : articals) {
-			System.out.println(a.getUuid() + " : " + a.getTitle() + " : " + a.getUrl());
-		}
-	}
-
 	public JSONArray find(Integer officialAccountId) {
 		List<Artical> articals = articalDAO.find(officialAccountId);
 		JSONArray result = new JSONArray();
@@ -206,6 +191,91 @@ public class ArticalService {
 
 	public void setUnRead(Integer articalId) {
 		articalDAO.updateToUnRead(articalId);
+	}
+
+	public void offlineArtical() {
+		List<Artical> articals = articalDAO.findNeedOfflineArtical();
+		for (Artical artical : articals) {
+			saveHtmlToDisk(artical.getUrl(), artical.getUuid());
+			try {
+				Thread.sleep(1000 * 70);// 暂停70秒
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void saveHtmlToDisk(String url, String uuid) {
+		RequestResult requestResult = WebUtil.getUrlResponse(url, null, null, true);
+		if (!requestResult.isOk()) {
+			LogManager.log("get content error : " + url);
+			LogManager.log(requestResult.getResultStr());
+			return;
+		}
+		String html = requestResult.getResultStr();
+		String bathPath = "/home/pi/hdd/wx_artical/";
+		String fileName = bathPath + uuid + "/" + uuid + ".html";
+		Document document = Jsoup.parse(html);
+		Elements eles = document.getElementsByTag("img");
+		for (Element ele : eles) {
+			if (ele.hasAttr("src") || ele.hasAttr("data-src")) {
+				String picUrl = ele.attr("src");
+				if (ele.hasAttr("data-src") && StringUtil.isNotBlank(ele.attr("data-src"))) {
+					picUrl = ele.attr("data-src");
+				}
+				if (picUrl.startsWith("data:image/")) {
+					continue;
+				}
+				if (StringUtil.isBlank(picUrl)) {
+					continue;
+				}
+				picUrl = WebUtil.getRealURL(url, picUrl);
+				String picId = UUID.randomUUID().toString() + "." + picUrl.substring(picUrl.length() - 3);
+				WebUtil.downloadFileSimple(picUrl, new File(bathPath + uuid + "/" + picId));
+				ele.attr("src", picId);
+			}
+		}
+		eles = document.getElementsByTag("link");
+		for (Element ele : eles) {
+			if (ele.hasAttr("href") && "stylesheet".equals(ele.attr("rel"))) {
+				String href = ele.attr("href");
+				href = WebUtil.getRealURL(url, href);
+				String cssPath = UUID.randomUUID().toString() + ".css";
+				WebUtil.downloadFileSimple(href, new File(bathPath + uuid + "/" + cssPath));
+				ele.attr("href", cssPath);
+			}
+		}
+		eles = document.getElementsByTag("script");
+		for (Element ele : eles) {
+			if (ele.hasAttr("src")) {
+				String src = ele.attr("src");
+				src = WebUtil.getRealURL(url, src);
+				String jsPath = UUID.randomUUID().toString() + ".js";
+				WebUtil.downloadFileSimple(src, new File(bathPath + uuid + "/" + jsPath));
+				ele.attr("src", jsPath);
+			}
+		}
+		IOUtils.saveToFile(document.html().getBytes(), new File(fileName));
+	}
+
+	public static void main(String[] args) {
+		// ApplicationContext.getBean(ArticalService.class).crawl();
+		// ScriptEngineManager mgr = new ScriptEngineManager();
+		// ScriptEngine engine = mgr.getEngineByExtension("js");
+		// try {
+		// engine.eval("var aaa = 'bbb';var bbb = 'ccc'");
+		// } catch (ScriptException e) {
+		// e.printStackTrace();
+		// }
+		ArticalService as = new ArticalService();
+		// String historyUrl = "http://mp.weixin.qq.com/profile?src=3&timestamp=1462955032&ver=1&signature=6XnFE15hYT3PtRbwbPlJjzOBMetU1uI914M-q6uL*7TuhpEa2GlKCeDzJTBd86M67OXxYr*8w0fdBFKs7JZYFQ==";
+		// historyUrl = "http://mp.weixin.qq.com/profile?src=3&timestamp=1462956037&ver=1&signature=SrvuhkyQMfuG-9qM6S8D0aSvFiHuLuw2QN11IftWTOEw9v8HCamK3b3EkrtGncFIr95IqJMmZSB9wWE0YRVVLQ==";
+		// List<Artical> articals = as.parseArtical(historyUrl, 12);
+		// for (Artical a : articals) {
+		// System.out.println(a.getUuid() + " : " + a.getTitle() + " : " + a.getUrl());
+		// }
+		String url = "http://mp.weixin.qq.com/s?timestamp=1462959204&src=3&ver=1&signature=W029zTYLzc2FkePsbEHcZmaE3iR3MjSyhRmH0ETUYtIxX4ZNDtosRgmf7vR-uhy3ENziuGHHlYcERSNGsbWBIbGkGnosGZx35O-zrHsT4a4m-fz9MLy-cYu4MuJlB3ifgxAgsPkYnnnFos5HIJWOZFHsJPoBDK9HKWX2aI8gINw=";
+		as.saveHtmlToDisk(url, "aaa");
 	}
 
 }
