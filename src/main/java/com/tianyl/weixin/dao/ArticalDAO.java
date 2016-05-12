@@ -84,4 +84,9 @@ public class ArticalDAO {
 		return JdbcUtil.query(sql, new GenericRowMapper<>(Artical.class));
 	}
 
+	public void updateOfflineUrl(Integer id, String offlineUrl) {
+		String sql = "update wx_artical set offlineUrl = ? where id = ? ";
+		JdbcUtil.update(sql, offlineUrl, id);
+	}
+
 }

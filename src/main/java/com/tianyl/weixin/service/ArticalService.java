@@ -197,6 +197,8 @@ public class ArticalService {
 		List<Artical> articals = articalDAO.findNeedOfflineArtical();
 		for (Artical artical : articals) {
 			saveHtmlToDisk(artical.getUrl(), artical.getUuid());
+			String offlineUrl = "http://tianice.51vip.biz:8889/" + artical.getUuid() + "/" + artical.getUuid() + ".html";
+			articalDAO.updateOfflineUrl(artical.getId(), offlineUrl);
 			try {
 				Thread.sleep(1000 * 70);// 暂停70秒
 			} catch (InterruptedException e) {
