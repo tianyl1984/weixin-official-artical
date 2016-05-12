@@ -33,4 +33,33 @@ public class FileUtil {
 		return sb.toString();
 	}
 
+	public static void deleteFiles(String path) {
+		File file = new File(path);
+		if (file.isDirectory()) {
+			deleteDir(file);
+		} else {
+			deleteFile(file);
+		}
+	}
+
+	public static void deleteDir(File file) {
+		if (file.isFile()) {
+			return;
+		}
+		for (File child : file.listFiles()) {
+			if (child.isFile()) {
+				deleteFile(child);
+			} else {
+				deleteDir(child);
+			}
+		}
+		file.delete();
+	}
+
+	public static void deleteFile(File file) {
+		if (file.isFile()) {
+			file.delete();
+		}
+	}
+
 }

@@ -145,7 +145,7 @@ public class WebUtil {
 			HttpURLConnection con = (HttpURLConnection) new URL(checkUrl(url)).openConnection();
 			con.setUseCaches(false);
 			if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				throw new RuntimeException("download error url : " + url);
+				throw new RuntimeException("download error response code : " + con.getResponseCode() + " url : " + url);
 			}
 			InputStream is = con.getInputStream();
 			BufferedInputStream bis = new BufferedInputStream(is);
@@ -186,6 +186,9 @@ public class WebUtil {
 		// 历史页
 		url = "http://mp.weixin.qq.com/profile?src=3&timestamp=1463031441&ver=1&signature=6XnFE15hYT3PtRbwbPlJjzOBMetU1uI914M-q6uL*7TuhpEa2GlKCeDzJTBd86M6nXxvwugInETSj43ckD57tw==";
 		// System.out.println(getUrlResponse(url));
-		System.out.println(getUrlResponse(url, null, null, true).getResultStr());
+		// System.out.println(getUrlResponse(url, null, null, true).getResultStr());
+		url = "http://mmbiz.qpic.cn/mmbiz/z7ZD1WagSLhDonNDyvib5Gorv4ibOYT6utD3U73C02fv2zHG4Gb3tic71fGPRyEEHoImU3meicBPam4OCQxfLEU2xA/0?wx_fmt=jpeg";
+		downloadFileSimple(url, new File("e:/aa.jpeg"));
 	}
+
 }

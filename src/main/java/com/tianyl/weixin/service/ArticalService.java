@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.tianyl.core.ioc.annotation.Autowired;
 import com.tianyl.core.ioc.annotation.Service;
 import com.tianyl.core.util.StringUtil;
+import com.tianyl.core.util.io.FileUtil;
 import com.tianyl.core.util.io.IOUtils;
 import com.tianyl.core.util.log.LogManager;
 import com.tianyl.core.util.webClient.RequestResult;
@@ -196,9 +197,13 @@ public class ArticalService {
 	public void offlineArtical() {
 		List<Artical> articals = articalDAO.findNeedOfflineArtical();
 		for (Artical artical : articals) {
-			saveHtmlToDisk(artical.getUrl(), artical.getUuid());
-			String offlineUrl = "http://tianice.51vip.biz:8889/" + artical.getUuid() + "/" + artical.getUuid() + ".html";
-			articalDAO.updateOfflineUrl(artical.getId(), offlineUrl);
+			try {
+				saveHtmlToDisk(artical.getUrl(), artical.getUuid());
+				String offlineUrl = "http://tianice.51vip.biz:8889/" + artical.getUuid() + "/" + artical.getUuid() + ".html";
+				articalDAO.updateOfflineUrl(artical.getId(), offlineUrl);
+			} catch (Exception e) {
+				LogManager.log(e);
+			}
 			try {
 				Thread.sleep(1000 * 70);// 暂停70秒
 			} catch (InterruptedException e) {
@@ -215,8 +220,9 @@ public class ArticalService {
 			return;
 		}
 		String html = requestResult.getResultStr();
-		String bathPath = "/home/pi/hdd/wx_artical/";
-		String fileName = bathPath + uuid + "/" + uuid + ".html";
+		String basePath = "/home/pi/hdd/wx_artical/";
+		String fileName = basePath + uuid + "/" + uuid + ".html";
+		FileUtil.deleteFiles(basePath + uuid);
 		Document document = Jsoup.parse(html);
 		Elements eles = document.getElementsByTag("img");
 		for (Element ele : eles) {
@@ -232,8 +238,13 @@ public class ArticalService {
 					continue;
 				}
 				picUrl = WebUtil.getRealURL(url, picUrl);
-				String picId = UUID.randomUUID().toString() + "." + picUrl.substring(picUrl.length() - 3);
-				WebUtil.downloadFileSimple(picUrl, new File(bathPath + uuid + "/" + picId));
+				String picId = UUID.randomUUID().toString();
+				if (picUrl.toLowerCase().endsWith("jpeg")) {
+					picId += ".jpeg";
+				} else {
+					picId += "." + picUrl.substring(picUrl.length() - 3);
+				}
+				WebUtil.downloadFileSimple(picUrl, new File(basePath + uuid + "/" + picId));
 				ele.attr("src", picId);
 			}
 		}
@@ -243,7 +254,7 @@ public class ArticalService {
 				String href = ele.attr("href");
 				href = WebUtil.getRealURL(url, href);
 				String cssPath = UUID.randomUUID().toString() + ".css";
-				WebUtil.downloadFileSimple(href, new File(bathPath + uuid + "/" + cssPath));
+				WebUtil.downloadFileSimple(href, new File(basePath + uuid + "/" + cssPath));
 				ele.attr("href", cssPath);
 			}
 		}
@@ -253,7 +264,7 @@ public class ArticalService {
 				String src = ele.attr("src");
 				src = WebUtil.getRealURL(url, src);
 				String jsPath = UUID.randomUUID().toString() + ".js";
-				WebUtil.downloadFileSimple(src, new File(bathPath + uuid + "/" + jsPath));
+				WebUtil.downloadFileSimple(src, new File(basePath + uuid + "/" + jsPath));
 				ele.attr("src", jsPath);
 			}
 		}
