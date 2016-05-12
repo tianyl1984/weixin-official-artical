@@ -200,4 +200,12 @@ public class ArticalService {
 		return result;
 	}
 
+	public void setHasReadByOfficialAccountId(Integer officialAccountId) {
+		articalDAO.updateToReadByOfficialAccountId(officialAccountId);
+	}
+
+	public void setUnRead(Integer articalId) {
+		articalDAO.updateToUnRead(articalId);
+	}
+
 }

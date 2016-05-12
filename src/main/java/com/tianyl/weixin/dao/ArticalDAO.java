@@ -69,4 +69,14 @@ public class ArticalDAO {
 		return JdbcUtil.query(sql, new GenericRowMapper<>(Artical.class), officialAccountId, false);
 	}
 
+	public void updateToReadByOfficialAccountId(Integer officialAccountId) {
+		String sql = "update wx_artical set hasRead = ? where id_officialaccount = ? ";
+		JdbcUtil.update(sql, true, officialAccountId);
+	}
+
+	public void updateToUnRead(Integer articalId) {
+		String sql = "update wx_artical set hasRead = ? where id = ?";
+		JdbcUtil.update(sql, false, articalId);
+	}
+
 }

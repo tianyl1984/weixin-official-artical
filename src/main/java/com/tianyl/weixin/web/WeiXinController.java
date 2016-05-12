@@ -48,8 +48,17 @@ public class WeiXinController {
 		articalService.setHasRead(articalId);
 	}
 
+	public void setHasReadByOfficialAccountId(Integer officialAccountId) {
+		articalService.setHasReadByOfficialAccountId(officialAccountId);
+	}
+
+	public void setUnRead(Integer articalId) {
+		articalService.setUnRead(articalId);
+	}
+
 	public Object getAccountCount() {
 		JSONObject obj = officialAccountService.getAccountCount();
 		return obj;
 	}
+
 }
