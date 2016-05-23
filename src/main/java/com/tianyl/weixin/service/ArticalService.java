@@ -60,13 +60,19 @@ public class ArticalService {
 			if (articals != null && articals.size() > 0) {
 				Set<String> existUuids = articalDAO.findUuids(oa.getId());
 				List<Artical> toSave = new ArrayList<>();
+				List<Artical> toUpdate = new ArrayList<>();
 				for (Artical ar : articals) {
 					if (!existUuids.contains(ar.getUuid())) {
 						toSave.add(ar);
+					} else {
+						toUpdate.add(ar);
 					}
 				}
 				if (toSave.size() > 0) {
 					articalDAO.save(toSave);
+				}
+				if (toUpdate.size() > 0) {
+					articalDAO.updateUrlByUuid(toUpdate);
 				}
 			}
 		}

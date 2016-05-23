@@ -89,4 +89,15 @@ public class ArticalDAO {
 		JdbcUtil.update(sql, offlineUrl, id);
 	}
 
+	public void updateUrlByUuid(List<Artical> toUpdate) {
+		for (Artical ar : toUpdate) {
+			updateUrlByUuid(ar);
+		}
+	}
+
+	public void updateUrlByUuid(Artical ar) {
+		String sql = "update wx_artical set url = ? where uuid = ? ";
+		JdbcUtil.update(sql, ar.getUrl(), ar.getUuid());
+	}
+
 }

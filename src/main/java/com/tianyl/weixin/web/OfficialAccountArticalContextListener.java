@@ -31,7 +31,7 @@ public class OfficialAccountArticalContextListener implements ServletContextList
 				}
 				LogManager.log("end crawl job");
 			}
-		}, 10 * 1000, 1000 * 60 * 60 * 20);// 20小时执行一次
+		}, 10 * 1000, 1000 * 60 * 60 * 10);// 20小时执行一次
 		offlineTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
