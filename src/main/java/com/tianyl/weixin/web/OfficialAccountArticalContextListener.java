@@ -26,12 +26,13 @@ public class OfficialAccountArticalContextListener implements ServletContextList
 				LogManager.log("start crawl job");
 				try {
 					ApplicationContext.getBean(ArticalService.class).crawl();
+					ApplicationContext.getBean(ArticalService.class).offlineArtical();
 				} catch (Exception e) {
 					LogManager.log(e);
 				}
 				LogManager.log("end crawl job");
 			}
-		}, 10 * 1000, 1000 * 60 * 60 * 10);// 20小时执行一次
+		}, 10 * 1000, 1000 * 60 * 60 * 10);// 10小时执行一次
 		offlineTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
