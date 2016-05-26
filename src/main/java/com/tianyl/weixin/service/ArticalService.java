@@ -187,6 +187,7 @@ public class ArticalService {
 			obj.put("publishDate", artical.getPublishDate());
 			obj.put("title", artical.getTitle());
 			obj.put("url", artical.getUrl());
+			obj.put("offlineUrl", artical.getOfflineUrl());
 			result.add(obj);
 		}
 		return result;
